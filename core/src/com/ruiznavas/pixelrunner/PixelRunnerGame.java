@@ -2,11 +2,13 @@ package com.ruiznavas.pixelrunner;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.ruiznavas.pixelrunner.handlers.Contenido;
 import com.ruiznavas.pixelrunner.handlers.ManagerEstadoJuego;
+import com.ruiznavas.pixelrunner.handlers.MiInput;
+import com.ruiznavas.pixelrunner.handlers.MiProcesadorEntrada;
 
 public class PixelRunnerGame extends ApplicationAdapter {
 	public static final String TITULO = "PixelRunner";
@@ -22,9 +24,18 @@ public class PixelRunnerGame extends ApplicationAdapter {
 	private OrthographicCamera camaraHud;
 	
 	private ManagerEstadoJuego managerEstados;
+	public static Contenido recursos;
 	
 	@Override
 	public void create () {
+		
+		Gdx.input.setInputProcessor(new MiProcesadorEntrada());
+		recursos = new Contenido();
+		recursos.cargarTextura("herochar.png", "heroe");
+		recursos.cargarTextura("orb.png", "orbe");
+		recursos.cargarTextura("hud.png", "hud");
+		
+		
 		batch = new SpriteBatch();
 		camara = new OrthographicCamera();
 		camara.setToOrtho(false, V_ANCHO, V_ALTO);
@@ -36,14 +47,18 @@ public class PixelRunnerGame extends ApplicationAdapter {
 
 	@Override
 	public void render () {
-//		Gdx.gl.glClearColor(1, 0, 0, 1);
-//		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		acumulado += Gdx.graphics.getDeltaTime();
 		while(acumulado >= STEP) {
 			acumulado -= STEP;
 			managerEstados.update(STEP);
 			managerEstados.render();
+			MiInput.update();
 		}
+		
+		batch.setProjectionMatrix(camaraHud.combined);
+		batch.begin();
+		batch.draw(recursos.getTextura("heroe"), 0, 0);
+		batch.end();
 	}
 	
 	@Override
